@@ -9,7 +9,7 @@ fal.config({
 export default function Home() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [introNanoPreview, setIntroNanoPreview] = useState<any>(null);
-  const [endNanoPreview, setEndNanoPreview] = useState<any>(null);
+  // const [endNanoPreview, setEndNanoPreview] = useState<any>(null);
   const [nanoResult, setNanoResult] = useState<any>(null);
   const [nanoLoading, setNanoLoading] = useState(false);
   const [error, setError] = useState<null | string>(null);
@@ -23,6 +23,7 @@ export default function Home() {
 
   console.log("Issue Prompt:", issuePrompt);
   console.log("Solution Prompt:", solutionPrompt);
+  console.log("Video Prompt:", videoPrompt);
 
   // Nano Banana Image
   const handleIntroSelect = (event) => {
@@ -43,23 +44,23 @@ export default function Home() {
     }
   };
 
-  const handleEndSelect = (event) => {
-    const file = event.target.files[0];
-    if (file && file.type.startsWith("image/")) {
-      setSelectedFile(file);
-      const reader = new FileReader();
+  // const handleEndSelect = (event) => {
+  //   const file = event.target.files[0];
+  //   if (file && file.type.startsWith("image/")) {
+  //     setSelectedFile(file);
+  //     const reader = new FileReader();
 
-      reader.onload = (e) => {
-        if (e.target) {
-          setEndNanoPreview(e.target.result);
-        }
-      };
-      reader.readAsDataURL(file);
-      setError(null);
-    } else {
-      setError("Please select a valid image file");
-    }
-  };
+  //     reader.onload = (e) => {
+  //       if (e.target) {
+  //         setEndNanoPreview(e.target.result);
+  //       }
+  //     };
+  //     reader.readAsDataURL(file);
+  //     setError(null);
+  //   } else {
+  //     setError("Please select a valid image file");
+  //   }
+  // };
 
   const handleIssuePrompt = (event: React.ChangeEvent<HTMLInputElement>) => {
     const prompt = event.target.value;
@@ -120,7 +121,7 @@ export default function Home() {
         try {
           const response: any = await ai.models.generateContent({
             model: "gemini-2.5-flash-image-preview",
-            contents: videoPrompt,
+            contents: prompt,
           });
 
           const parts = response.candidates[0].content.parts;
@@ -151,6 +152,8 @@ export default function Home() {
       setNanoLoading(false);
     }
   };
+
+  console.log("nanoResult :", nanoResult);
 
   const uploadBase64ToFal = async (base64Data: string) => {
     // Convert base64 to blob
@@ -211,209 +214,265 @@ export default function Home() {
   return (
     <div
       className="flex h-screen bg-background"
-      style={{ maxWidth: "800px", margin: "0 auto", padding: "20px" }}
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        margin: "0 auto",
+        padding: "20px",
+      }}
     >
-      <h1>Fix YouTube Video Scene</h1>
-
-      <p>
-        Select a start point and an endpoint from a YouTube scene you’d like to
-        change. These will define the ideal images that serve as the foundation
-        for your transformation.
-      </p>
-
-      <div className="flex" style={{ display: "flex" }}>
-        <div className="w-1/2">
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleIntroSelect}
-            style={{ marginBottom: "10px" }}
-          />
-
-          {introNanoPreview && (
-            <div className="">
-              <h3>Selected Start Point of the Video:</h3>
-              <img
-                src={introNanoPreview}
-                alt="Selected"
-                style={{ maxWidth: "300px", height: "auto" }}
-              />
-              <p>Beginning Scene</p>
-            </div>
-          )}
-        </div>
-
-        <div className="w-1/2">
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleEndSelect}
-            style={{ marginBottom: "10px" }}
-          />
-
-          {endNanoPreview && (
-            <div className="">
-              <h3>Selected End Point of the Video:</h3>
-              <img
-                src={endNanoPreview}
-                alt="Selected"
-                style={{ maxWidth: "300px", height: "auto" }}
-              />
-              <p>End Scene</p>
-            </div>
-          )}
-        </div>
-      </div>
-
-      <input
-        type="text"
-        onChange={handleIssuePrompt}
-        placeholder="What is wrong with the image?"
-        value={issuePrompt}
-        style={{ width: "100%", padding: "10px", marginBottom: "20px" }}
-      />
-
-      <input
-        type="text"
-        onChange={handleSolutionPrompt}
-        placeholder="What is the ideal outcome?"
-        value={solutionPrompt}
-        style={{ width: "100%", padding: "10px", marginBottom: "20px" }}
-      />
-
-      <button
-        onClick={processNanoImage}
-        disabled={!selectedFile || nanoLoading}
+      <div
         style={{
-          padding: "10px 20px",
-          backgroundColor: nanoLoading ? "#ccc" : "#007bff",
-          color: "white",
-          border: "none",
-          borderRadius: "4px",
-          cursor: nanoLoading ? "not-allowed" : "pointer",
+          display: "flex",
+          flexDirection: "column",
+          width: "50%",
+          padding: "20px",
         }}
       >
-        {nanoLoading ? "Processing..." : "Fix your scene"}
-      </button>
+        <h1>Fix YouTube Video Scene</h1>
 
-      <p>
-        Add two images that represent your ideal transformation — a starting
-        point and an endpoint. Our generator will turn them into a smooth video,
-        bringing your vision to life for YouTube.
-      </p>
+        <p>
+          Select an image from a YouTube scene you’d like to change. This will
+          define the ideal images that serve as the foundation for your
+          transformation.
+        </p>
 
-      {error && <div style={{ color: "red", marginTop: "10px" }}>{error}</div>}
-
-      {nanoResult && (
-        <div style={{ marginTop: "20px" }}>
-          {nanoResult.text && (
-            <div>
-              <h3>Generated Text:</h3>
-              <p>{nanoResult.text}</p>
-            </div>
-          )}
-
-          {nanoResult.image && (
-            <div>
-              <h3>Generated Image:</h3>
-              <img
-                src={nanoResult.image}
-                alt="Generated"
-                style={{ maxWidth: "100%", height: "auto" }}
-              />
-              <br />
-              <div style={{ display: "flex" }}>
-                <button
-                  onClick={downloadResult}
-                  style={{
-                    marginTop: "10px",
-                    padding: "8px 16px",
-                    backgroundColor: "#28a745",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Download Image
-                </button>
-                <button
-                  onClick={() => {
-                    setNanoResult(null);
-                  }}
-                  style={{
-                    marginTop: "10px",
-                    padding: "8px 16px",
-                    backgroundColor: "#28a745",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Reset
-                </button>
-              </div>
-            </div>
-          )}
-
-          <div>
-            <p>Are you happy with the image? If so, let's create a video</p>
-
+        <div
+          className="flex"
+          style={{ display: "flex", flexDirection: "column" }}
+        >
+          <div className="w-1/2">
             <input
-              type="text"
-              onChange={handleVideoPrompt}
-              placeholder="Describe the video flow you'd like. Add your subject, its action, and your preferred style to generate the scene."
-              value={videoPrompt}
-              style={{ width: "100%", padding: "10px", marginBottom: "20px" }}
+              type="file"
+              accept="image/*"
+              onChange={handleIntroSelect}
+              style={{ marginBottom: "10px" }}
             />
 
+            {error && (
+              <div style={{ color: "red", marginTop: "10px" }}>{error}</div>
+            )}
+
+            {introNanoPreview && (
+              <div className="">
+                <h3>Selected Start Point of the Video:</h3>
+                <img
+                  src={introNanoPreview}
+                  alt="Selected"
+                  style={{ maxWidth: "300px", height: "auto" }}
+                />
+                <h4>What's wrong with the scene?</h4>
+              </div>
+            )}
+          </div>
+
+          {/* <div className="w-1/2">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleEndSelect}
+              style={{ marginBottom: "10px" }}
+            />
+
+            {endNanoPreview && (
+              <div className="">
+                <h3>Selected End Point of the Video:</h3>
+                <img
+                  src={endNanoPreview}
+                  alt="Selected"
+                  style={{ maxWidth: "300px", height: "auto" }}
+                />
+                <p>End Scene</p>
+              </div>
+            )}
+          </div> */}
+          <label>What is wrong with the image?</label>
+          <input
+            type="text"
+            onChange={handleIssuePrompt}
+            value={issuePrompt}
+            style={{ width: "auto", padding: "10px", marginBottom: "20px" }}
+          />
+
+          <label>What is the ideal outcome?</label>
+          <input
+            type="text"
+            onChange={handleSolutionPrompt}
+            value={solutionPrompt}
+            style={{ width: "auto", padding: "10px", marginBottom: "20px" }}
+          />
+
+          <div style={{ display: "flex" }}>
             <button
-              onClick={processVideoByVeo}
-              disabled={!nanoResult.image || veoLoading}
+              onClick={processNanoImage}
+              disabled={!selectedFile || nanoLoading}
               style={{
                 padding: "10px 20px",
-                backgroundColor: veoLoading ? "#ccc" : "#007bff",
+                backgroundColor: nanoLoading ? "#ccc" : "#007bff",
                 color: "white",
                 border: "none",
                 borderRadius: "4px",
-                cursor: veoLoading ? "not-allowed" : "pointer",
+                cursor: nanoLoading ? "not-allowed" : "pointer",
               }}
             >
-              {veoLoading ? "Processing..." : "Generate a video"}
+              {nanoLoading ? "Processing..." : "Fix your scene"}
+            </button>
+
+            <button
+              onClick={() => {
+                setNanoResult(null);
+              }}
+              style={{
+                padding: "10px 20px",
+                marginLeft: "10px",
+                backgroundColor: "#28a745",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+              }}
+            >
+              Reset
             </button>
           </div>
         </div>
-      )}
+      </div>
 
-      {veoVideo && (
-        <div style={{ marginTop: "20px" }}>
-          <h3>Generated Video:</h3>
-          <video
-            src={veoVideo.video.url}
-            controls
-            style={{ maxWidth: "100%", height: "auto" }}
-          />
-          <br />
-          <a
-            href={veoVideo.video.url}
-            download="generated-video.mp4"
-            style={{
-              marginTop: "10px",
-              display: "inline-block",
-              padding: "8px 16px",
-              backgroundColor: "#28a745",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
-              textDecoration: "none",
-            }}
-          >
-            Download Video
-          </a>
-        </div>
-      )}
+      <div
+        style={{
+          width: "50%",
+          display: "flex",
+          flexDirection: "column",
+          padding: "20px",
+        }}
+      >
+        {nanoResult && (
+          <div>
+            {/* {nanoResult.text && (
+              <div>
+                <h3>Generated Text:</h3>
+                <p>{nanoResult.text}</p>
+              </div>
+            )} */}
+
+            {nanoResult.image && (
+              <div>
+                <div>
+                  <h2>Generated Image:</h2>
+                  <img
+                    src={nanoResult.image}
+                    alt="Generated"
+                    style={{ maxWidth: "100%", height: "auto" }}
+                  />
+                  <br />
+                  <div style={{ display: "flex" }}>
+                    <button
+                      onClick={downloadResult}
+                      style={{
+                        padding: "10px 20px",
+                        backgroundColor: "#28a745",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "4px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Download Image
+                    </button>
+                    <button
+                      onClick={() => {
+                        setNanoResult(null);
+                      }}
+                      style={{
+                        marginLeft: "10px",
+                        padding: "10px 20px",
+                        backgroundColor: "#28a745",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "4px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Reset
+                    </button>
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  <h3>
+                    Are you happy with the image? If so, let's create a video
+                  </h3>
+
+                  <label>
+                    Describe the video flow you'd like. Add your subject, its
+                    action, and your preferred style to generate the scene.
+                  </label>
+                  <input
+                    type="text"
+                    onChange={handleVideoPrompt}
+                    value={videoPrompt}
+                    style={{
+                      width: "auto",
+                      padding: "10px",
+                      marginBottom: "20px",
+                    }}
+                  />
+
+                  <button
+                    onClick={processVideoByVeo}
+                    disabled={!nanoResult.image || veoLoading}
+                    style={{
+                      padding: "10px 20px",
+                      backgroundColor: veoLoading ? "#ccc" : "#007bff",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "4px",
+                      cursor: veoLoading ? "not-allowed" : "pointer",
+                    }}
+                  >
+                    {veoLoading ? "Processing..." : "Generate a video"}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* <p>
+          Add two images that represent your ideal transformation — a starting
+          point and an endpoint. Our generator will turn them into a smooth
+          video, bringing your vision to life for YouTube.
+        </p> */}
+
+        {veoVideo && (
+          <div style={{ marginTop: "20px" }}>
+            <h3>Generated Video:</h3>
+            <video
+              src={veoVideo.video.url}
+              controls
+              style={{ maxWidth: "100%", height: "auto" }}
+            />
+            <br />
+            <a
+              href={veoVideo.video.url}
+              download="generated-video.mp4"
+              style={{
+                marginTop: "10px",
+                display: "inline-block",
+                padding: "10px 20px",
+                backgroundColor: "#28a745",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+                textDecoration: "none",
+              }}
+            >
+              Download Video
+            </a>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
