@@ -1,6 +1,6 @@
 # nano-banana-hackathon
 
-Select a scene you don't like from your YouTube, get an idea outcome using Nano Banana then feed that image into Veo3, get the video you want. No more retakes!
+Pick a scene you don’t like from your YouTube video, refine it into your ideal image with Nano Banana, then feed it into Veo3 to generate the video you actually want — no retakes required!
 
 ## Developing
 
