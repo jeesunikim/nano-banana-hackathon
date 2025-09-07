@@ -4,7 +4,7 @@ Pick a scene you don’t like from your YouTube video, refine it into your ideal
 
 ## Live URL
 
-https://nano-banana-hackathon-f3xa6jlvy-jees-projects-115b6eb8.vercel.app/
+[https://nano-banana-hackathon-f3xa6jlvy-jees-projects-115b6eb8.vercel.app/](https://nano-banana-hackathon-xi.vercel.app/)
 
 ## Developing
 
