@@ -2,6 +2,10 @@
 
 Pick a scene you don’t like from your YouTube video, refine it into your ideal image with Nano Banana, then feed it into Veo3 to generate the video you actually want — no retakes required!
 
+## Live URL
+
+https://nano-banana-hackathon-f3xa6jlvy-jees-projects-115b6eb8.vercel.app/
+
 ## Developing
 
 Create `.env.local` file and add your credentials
